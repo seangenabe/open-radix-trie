@@ -1,0 +1,37 @@
+{
+  "name": "open-radix-trie",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seangenabe/open-radix-trie.git"
+  },
+  "keywords": [
+    "radix",
+    "trie"
+  ],
+  "author": "Sean Genabe <seangenabe@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seangenabe/open-radix-trie/issues"
+  },
+  "homepage": "https://github.com/seangenabe/open-radix-trie#readme",
+  "dependencies": {
+    "@seangenabe/nn": "^1.1.0",
+    "common-prefix": "^1.1.0",
+    "starry.any": "^3.0.0",
+    "xerpath": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.4",
+    "archy": "^1.0.0",
+    "ava": "^0.25.0",
+    "starry.map": "^3.0.0",
+    "typescript": "^2.7.2"
+  }
+}
