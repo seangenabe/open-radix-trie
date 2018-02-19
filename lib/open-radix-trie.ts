@@ -158,7 +158,7 @@ export default class OpenRadixTrie<
   ): { value: TValue | undefined; args: any[]; remainingPath: string } {
     assert.equal(typeof path, 'string', 'Path must be a string.')
     let node = this.r
-    const args = []
+    const args: TValue[] = []
 
     while (true) {
       // If path is the empty string, return this node.
@@ -189,6 +189,7 @@ export default class OpenRadixTrie<
           node = child
           path = result.remainingPath
           found = true
+          args.push(result.value)
           break
         }
       }
