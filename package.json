@@ -1,7 +1,7 @@
 {
   "name": "open-radix-trie",
   "version": "1.0.0",
-  "description": "",
+  "description": "Radix trie implementation with partial lookups and extensible paths.",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -25,7 +25,7 @@
     "@seangenabe/nn": "^1.1.0",
     "common-prefix": "^1.1.0",
     "starry.any": "^3.0.0",
-    "xerpath": "1.0.0"
+    "xerpath": "^3.0.2"
   },
   "devDependencies": {
     "@types/node": "^9.4.4",

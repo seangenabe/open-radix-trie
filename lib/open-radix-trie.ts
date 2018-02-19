@@ -1,26 +1,29 @@
 import Node from './node'
-import commonPrefix = require('common-prefix')
+import getCommonPrefix = require('common-prefix')
 import {
   ExtensiblePathComponent,
-  ExtensiblePathContext,
+  ExtensiblePathRunner,
   ExtensiblePathComponentMaker,
   ExtensiblePath,
-  createExtensiblePathContext
+  createExtensiblePathRunner
 } from 'xerpath'
 import * as assert from 'assert'
 import { ROOT_MARKER } from './symbols'
 
-export default class OpenRadixTrie<TValue> {
+export default class OpenRadixTrie<
+  TValue,
+  TContext extends Record<keyof TContext, ExtensiblePathComponentMaker> = any
+> {
   /**
    * The root node.
    */
   private r: Node<TValue>
-  private x: ExtensiblePathContext
+  private x: ExtensiblePathRunner & TContext
 
-  constructor() {
+  constructor(context?: TContext) {
     const r = new Node<TValue>(ROOT_MARKER)
     this.r = r
-    this.x = createExtensiblePathContext()
+    this.x = createExtensiblePathRunner(context)
   }
 
   /**
@@ -81,7 +84,10 @@ export default class OpenRadixTrie<TValue> {
           return this.setOnNode(child, pathComponents, value)
         }
         // Get common prefix.
-        const commonString: string = commonPrefix([childKey, currentComponent])
+        const commonString: string = getCommonPrefix([
+          childKey,
+          currentComponent
+        ])
         const commonLength = commonString.length
         if (commonLength === 0) {
           // Did not match child, continue.
@@ -144,19 +150,6 @@ export default class OpenRadixTrie<TValue> {
   }
 
   /**
-   * Registers a custom matcher.
-   */
-  register(key: string, componentMaker: ExtensiblePathComponentMaker): void {
-    assert.equal(typeof key, 'string', 'Key must be a string.')
-    assert.equal(
-      typeof componentMaker,
-      'function',
-      'Component maker must be a function.'
-    )
-    this.x[key] = componentMaker
-  }
-
-  /**
    * Gets the value of the data structure at the specified path.
    * @param path
    */
@@ -174,28 +167,41 @@ export default class OpenRadixTrie<TValue> {
       }
 
       // Check if any of the string children match.
+      let found: boolean = false
       for (let child of node.stringChildren) {
         const childKey = child.key as string
         if (path.startsWith(childKey)) {
           node = child
           path = path.substr(childKey.length)
-          continue
+          found = true
+          break
         }
+      }
+      if (found) {
+        continue
       }
 
       // Check if any of the custom children match.
       for (let child of node.customChildren.values()) {
         const childKey = child.key as ExtensiblePathComponent
         const result = childKey(path)
-        if (result.match) {
+        if (result != null) {
           node = child
           path = result.remainingPath
-          continue
+          found = true
+          break
         }
+      }
+      if (found) {
+        continue
       }
 
       // No children matched, return this node.
-      return { value: node.value, remainingPath: path, args }
+      return {
+        value: node.value,
+        remainingPath: path,
+        args
+      }
     }
   } // get
 

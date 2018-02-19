@@ -157,6 +157,49 @@ test('get with remaining', t => {
   t.is(result.value, 1)
 })
 
+test('get no match', t => {
+  const trie = new OpenRadixTrie<number>()
+  trie.set('toast', 1)
+  trie.set('test', 2)
+  const result = trie.get('treetop')
+  t.deepEqual(result.args, [])
+  t.is(result.value, undefined)
+})
+
+test('get with custom path component', t => {
+  const context = {
+    word() {
+      return s => {
+        const res = /[^\s]+/.exec(s)
+        if (res == null) return null
+        return { value: res[0], remainingPath: s.substr(res[0].length) }
+      }
+    }
+  }
+  const trie = new OpenRadixTrie<number, typeof context>(context)
+  trie.set(r => r`sky ${r.word()} orange`, 7)
+  const result = trie.get('sky apple orange')
+  t.is(result.value, 7)
+  t.deepEqual(result.args, ['apple'])
+})
+
+test('get with custom path component (negate)', t => {
+  const context = {
+    word() {
+      return s => {
+        const res = /[^\s]+/.exec(s)
+        if (res == null) return null
+        return { value: res[0], remainingPath: s.substr(res[0].length) }
+      }
+    }
+  }
+  const trie = new OpenRadixTrie<number, typeof context>(context)
+  trie.set(r => r`sky ${r.word()} orange`, 7)
+  const result = trie.get('sky ')
+  t.is(result.value, undefined)
+  t.deepEqual(result.args, [])
+})
+
 interface TreeDef<T> {
   value?: T
   subtree?: { [key: string]: TreeDef<T> }
