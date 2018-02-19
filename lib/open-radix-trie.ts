@@ -312,3 +312,5 @@ export default class OpenRadixTrie<
     }
   }
 } // class
+
+export { OpenRadixTrie }
