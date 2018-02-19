@@ -158,12 +158,13 @@ export default class OpenRadixTrie<
   ): { value: TValue | undefined; args: any[]; remainingPath: string } {
     assert.equal(typeof path, 'string', 'Path must be a string.')
     let node = this.r
-    const args: TValue[] = []
+    const args: any[] = []
+    let value: TValue | undefined = undefined
 
     while (true) {
       // If path is the empty string, return this node.
       if (path === '') {
-        return { value: node.value, remainingPath: path, args }
+        return { value: node.value || value, remainingPath: path, args }
       }
 
       // Check if any of the string children match.
@@ -174,6 +175,7 @@ export default class OpenRadixTrie<
           node = child
           path = path.substr(childKey.length)
           found = true
+          value = child.value || value
           break
         }
       }
@@ -189,6 +191,7 @@ export default class OpenRadixTrie<
           node = child
           path = result.remainingPath
           found = true
+          value = child.value || value
           args.push(result.value)
           break
         }
@@ -199,7 +202,7 @@ export default class OpenRadixTrie<
 
       // No children matched, return this node.
       return {
-        value: node.value,
+        value: node.value || value,
         remainingPath: path,
         args
       }
