@@ -1,6 +1,6 @@
 {
   "name": "open-radix-trie",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Radix trie implementation with partial lookups and extensible paths.",
   "main": "lib/open-radix-trie.js",
   "scripts": {
