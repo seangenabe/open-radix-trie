@@ -314,6 +314,66 @@ export default class OpenRadixTrie<
       }
     }
   }
+
+  entries() {
+    return this.entriesOnNode([], this.r)
+  }
+
+  *entriesOnNode(
+    path: (string | ExtensiblePathComponent)[],
+    node: Node<TValue>
+  ): IterableIterator<[(string | ExtensiblePathComponent)[], TValue]> {
+    const currentPath = [...path]
+    if (typeof node.key !== 'symbol') {
+      currentPath.push(node.key)
+    }
+    if (node.value !== undefined) {
+      yield [currentPath, node.value]
+    }
+    for (let child of node.getChildren()) {
+      yield* this.entriesOnNode(currentPath, child)
+    }
+  }
+
+  *keys() {
+    for (let entry of this.entries()) {
+      yield entry[0]
+    }
+  }
+
+  *values() {
+    for (let entry of this.entries()) {
+      yield entry[1]
+    }
+  }
+
+  [Symbol.iterator]() {
+    return this.entries()
+  }
+
+  clear() {
+    this.r.value = undefined
+    this.r.customChildren.clear()
+    this.r.stringChildren.splice(0)
+  }
+
+  forEach(
+    callbackFn: (
+      value: TValue,
+      key: (string | ExtensiblePathComponent)[],
+      trie: this
+    ) => void,
+    thisArg?: any
+  ) {
+    for (let [key, value] of this.entries()) {
+      callbackFn.call(thisArg, value, key, this)
+    }
+  }
+
+  has(path: string): boolean {
+    const result = this.get(path)
+    return result.value !== undefined
+  }
 } // class
 
 export { OpenRadixTrie }
