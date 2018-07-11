@@ -16,15 +16,15 @@
     "radix",
     "trie"
   ],
-  "author": "Sean Genabe <seangenabe@outlook.com>",
+  "author": "Sean Genabe <seanmarviolivergenabe@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/seangenabe/open-radix-trie/issues"
   },
   "homepage": "https://github.com/seangenabe/open-radix-trie#readme",
   "dependencies": {
-    "@seangenabe/nn": "^1.1.0",
     "common-prefix": "^1.1.0",
+    "non-null": "^2.0.0",
     "starry.any": "^3.0.0",
     "xerpath": "^3.0.2"
   },
@@ -33,6 +33,6 @@
     "archy": "^1.0.0",
     "ava": "^0.25.0",
     "starry.map": "^3.0.0",
-    "typescript": "^2.7.2"
+    "typescript": "^2.9.2"
   }
 }

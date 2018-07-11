@@ -1,5 +1,5 @@
 import OpenRadixTrie from '../lib/open-radix-trie'
-import Node from '../lib/node'
+import { Node, getChildren } from '../lib/node'
 import test, { TestContext } from 'ava'
 import archy = require('archy')
 import { ROOT_MARKER } from '../lib/symbols'
@@ -257,7 +257,7 @@ function debugNode<T>(n: Node<T>): ArchyNode {
   }
   return {
     label,
-    nodes: [...map(n.getChildren(), child => debugNode<T>(child))]
+    nodes: [...map(getChildren(n), child => debugNode<T>(child))]
   }
 }
 

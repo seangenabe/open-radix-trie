@@ -1,13 +1,21 @@
-import Node from './node'
-import getCommonPrefix = require('common-prefix')
+import { ok } from 'assert'
+import * as getCommonPrefix from 'common-prefix'
 import {
-  ExtensiblePathComponent,
-  ExtensiblePathRunner,
-  ExtensiblePathComponentMaker,
+  createExtensiblePathRunner,
   ExtensiblePath,
-  createExtensiblePathRunner
+  ExtensiblePathComponent,
+  ExtensiblePathComponentMaker,
+  ExtensiblePathRunner
 } from 'xerpath'
-import * as assert from 'assert'
+import {
+  clone,
+  createNode,
+  getChildren,
+  hasChildren,
+  Node,
+  NodeKey,
+  RootNode
+} from './node'
 import { ROOT_MARKER } from './symbols'
 
 export default class OpenRadixTrie<
@@ -17,11 +25,11 @@ export default class OpenRadixTrie<
   /**
    * The root node.
    */
-  private r: Node<TValue>
+  private r: RootNode<TValue>
   private x: ExtensiblePathRunner & TContext
 
   constructor(context?: TContext) {
-    const r = new Node<TValue>(ROOT_MARKER)
+    const r = createNode<TValue>(ROOT_MARKER)
     this.r = r
     this.x = createExtensiblePathRunner(context)
   }
@@ -36,7 +44,10 @@ export default class OpenRadixTrie<
    * @param value The value. If `undefined`, the value is removed from the
    * data structure.
    */
-  set(path: ExtensiblePath | string, value: TValue | undefined): void {
+  set(
+    path: ExtensiblePath<TContext> | string,
+    value: TValue | undefined
+  ): void {
     if (value === undefined) {
       this.delete(path)
       return
@@ -45,7 +56,7 @@ export default class OpenRadixTrie<
     this.setOnNode(this.r, pathComponents, value)
   }
 
-  private setOnNode(
+  private setOnNode<TKey extends NodeKey>(
     node: Node<TValue>,
     pathComponents: (string | ExtensiblePathComponent)[],
     value: TValue
@@ -63,12 +74,12 @@ export default class OpenRadixTrie<
     }
 
     if (typeof currentComponent === 'string') {
-      let { key: parentKey } = node
+      let parentKey: NodeKey = node.key
 
       if (parentKey === ROOT_MARKER) {
         parentKey = ''
       } else if (typeof parentKey === 'symbol') {
-        assert(false, 'Unrecognized symbol for node key.')
+        ok(false, 'Unrecognized symbol for node key.')
         throw new Error()
       } else {
         parentKey = '' // Match with empty string for custom nodes.
@@ -102,10 +113,10 @@ export default class OpenRadixTrie<
         } else {
           // Split the key on the common prefix substring.
           // Recreate old tree with the old string.
-          const trimmedTree = child.clone()
+          const trimmedTree = clone(child)
           trimmedTree.key = childKey.substr(commonLength)
           // Create a new node with the prefix.
-          const newParentNode = new Node<TValue>(commonString)
+          const newParentNode = createNode<TValue>(commonString)
           // Replace the old tree.
           node.stringChildren[childIndex] = newParentNode
           // Attach.
@@ -116,7 +127,7 @@ export default class OpenRadixTrie<
             return
           } else {
             // Create new node with the remaining part of new string.
-            const newTree = new Node<TValue>(
+            const newTree = createNode<TValue>(
               currentComponent.substr(commonLength)
             )
             newParentNode.stringChildren.push(newTree)
@@ -127,22 +138,21 @@ export default class OpenRadixTrie<
       }
       // Did not match any child.
       // Create new node here.
-      const newNode = new Node<TValue>(currentComponent)
+      const newNode = createNode<TValue>(currentComponent)
       // Attach.
       node.stringChildren.push(newNode)
       // Traverse.
       return this.setOnNode(newNode, pathComponents, value)
     } else {
-      assert.equal(
-        typeof currentComponent,
-        'function',
+      ok(
+        typeof currentComponent === 'function',
         'Path component must be a function.'
       )
       // If current component is a path component:
       // Traverse for a matching path component
       let matchingNode = node.customChildren.get(currentComponent)
       if (matchingNode == null) {
-        matchingNode = new Node<TValue>(currentComponent)
+        matchingNode = createNode<TValue>(currentComponent)
         node.customChildren.set(currentComponent, matchingNode)
       }
       return this.setOnNode(matchingNode, pathComponents, value)
@@ -156,8 +166,8 @@ export default class OpenRadixTrie<
   get(
     path: string
   ): { value: TValue | undefined; args: any[]; remainingPath: string } {
-    assert.equal(typeof path, 'string', 'Path must be a string.')
-    let node = this.r
+    ok(typeof path === 'string', 'Path must be a string.')
+    let node: Node<TValue> = this.r
     const args: any[] = []
     let value: TValue | undefined = undefined
 
@@ -210,24 +220,20 @@ export default class OpenRadixTrie<
   } // get
 
   private buildPath(
-    path: ExtensiblePath | string
+    path: ExtensiblePath<TContext> | string
   ): (string | ExtensiblePathComponent)[] {
     let builtPath: Iterable<string | ExtensiblePathComponent>
     if (typeof path === 'string') {
       builtPath = [path]
     } else {
-      assert.equal(
-        typeof path,
-        'function',
-        'Extensible path must be a function.'
-      )
+      ok(typeof path === 'function', 'Extensible path must be a function.')
       builtPath = path(this.x)
     }
 
     return [...builtPath]
   }
 
-  delete(path: ExtensiblePath | string): boolean {
+  delete(path: ExtensiblePath<TContext> | string): boolean {
     const pathComponents = this.buildPath(path)
     return this.deleteOnNode(this.r, undefined, 0, pathComponents)
   }
@@ -280,7 +286,7 @@ export default class OpenRadixTrie<
     if (parentNode === undefined) {
       return
     }
-    if (!node.hasChildren()) {
+    if (!hasChildren(node)) {
       if (typeof key === 'number') {
         parentNode.stringChildren.splice(key, 1)
       } else {
@@ -289,7 +295,7 @@ export default class OpenRadixTrie<
     }
     if (
       node.value === undefined &&
-      typeof node.key === 'string' &&
+      node.type === 'string' &&
       node.customChildren.size === 0 &&
       node.stringChildren.length === 1
     ) {
@@ -300,7 +306,7 @@ export default class OpenRadixTrie<
       node.stringChildren = remainingNode.stringChildren
       node.value = remainingNode.value
     }
-    if (typeof parentNode.key === 'string') {
+    if (parentNode.type === 'string') {
       // Try to merge if there is only one remaining child.
       if (
         parentNode.customChildren.size === 0 &&
@@ -330,7 +336,7 @@ export default class OpenRadixTrie<
     if (node.value !== undefined) {
       yield [currentPath, node.value]
     }
-    for (let child of node.getChildren()) {
+    for (let child of getChildren(node)) {
       yield* this.entriesOnNode(currentPath, child)
     }
   }

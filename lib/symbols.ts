@@ -1,1 +1,1 @@
-export const ROOT_MARKER = Symbol()
+export const ROOT_MARKER: unique symbol = Symbol()
