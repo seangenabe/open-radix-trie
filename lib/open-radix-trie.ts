@@ -219,7 +219,7 @@ export default class OpenRadixTrie<
     }
   } // get
 
-  private buildPath(
+  buildPath(
     path: ExtensiblePath<TContext> | string
   ): (string | ExtensiblePathComponent)[] {
     let builtPath: Iterable<string | ExtensiblePathComponent>
