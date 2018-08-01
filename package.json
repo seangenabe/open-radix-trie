@@ -26,7 +26,7 @@
     "common-prefix": "^1.1.0",
     "non-null": "^2.0.0",
     "starry.any": "^3.0.0",
-    "xerpath": "^3.0.2"
+    "xerpath": "^3.1.0"
   },
   "devDependencies": {
     "@types/node": "^9.4.4",
