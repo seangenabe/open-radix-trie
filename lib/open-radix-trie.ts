@@ -244,6 +244,8 @@ export default class OpenRadixTrie<
       const last = ret[ret.length - 1]
       if (typeof last === 'string' && typeof item === 'string') {
         ret[ret.length - 1] = last + item
+      } else {
+        ret.push(item)
       }
     }
     return ret
