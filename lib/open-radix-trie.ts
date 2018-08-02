@@ -230,7 +230,23 @@ export default class OpenRadixTrie<
       builtPath = path(this.x)
     }
 
-    return [...builtPath].filter(s => s !== '')
+    return this.normalizePathComponents(builtPath)
+  }
+
+  private normalizePathComponents(
+    pathComponents: Iterable<string | ExtensiblePathComponent>
+  ) {
+    const ret: (string | ExtensiblePathComponent)[] = []
+    for (let item of pathComponents) {
+      if (item === '') {
+        continue
+      }
+      const last = ret[ret.length - 1]
+      if (typeof last === 'string' && typeof item === 'string') {
+        ret[ret.length - 1] = last + item
+      }
+    }
+    return ret
   }
 
   delete(path: ExtensiblePath<TContext> | string): boolean {
