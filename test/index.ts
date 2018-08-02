@@ -1,10 +1,7 @@
-import OpenRadixTrie from '../lib/open-radix-trie'
-import { Node, getChildren } from '../lib/node'
 import test, { TestContext } from 'ava'
-import archy = require('archy')
+import { Node } from '../lib/node'
+import OpenRadixTrie from '../lib/open-radix-trie'
 import { ROOT_MARKER } from '../lib/symbols'
-import map = require('starry.map')
-import { inspect } from 'util'
 
 test('empty tree', t => {
   const trie = new OpenRadixTrie<number>()
@@ -247,30 +244,4 @@ function checkTree<T>(
 
 function pathToString(path: string[]) {
   return path.join('->')
-}
-
-function debugTrie<T>(trie: OpenRadixTrie<T>) {
-  const rootNode = (trie as any).r as Node<T>
-  console.log(archy(debugNode<T>(rootNode)))
-}
-debugTrie
-
-function debugNode<T>(n: Node<T>): ArchyNode {
-  const { value, key } = n
-  const keyString = key === ROOT_MARKER ? 'ROOT' : key.toString()
-  let label: string
-  if (value === undefined) {
-    label = keyString
-  } else {
-    label = `${keyString}=${inspect(value, { depth: 0 })}`
-  }
-  return {
-    label,
-    nodes: [...map(getChildren(n), child => debugNode<T>(child))]
-  }
-}
-
-interface ArchyNode {
-  label: string
-  nodes: ArchyNode[]
 }
