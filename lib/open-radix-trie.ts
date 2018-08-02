@@ -56,7 +56,7 @@ export default class OpenRadixTrie<
     this.setOnNode(this.r, pathComponents, value)
   }
 
-  private setOnNode<TKey extends NodeKey>(
+  private setOnNode(
     node: Node<TValue>,
     pathComponents: (string | ExtensiblePathComponent)[],
     value: TValue
@@ -230,7 +230,7 @@ export default class OpenRadixTrie<
       builtPath = path(this.x)
     }
 
-    return [...builtPath]
+    return [...builtPath].filter(s => s !== '')
   }
 
   delete(path: ExtensiblePath<TContext> | string): boolean {
