@@ -6,6 +6,15 @@ import { ROOT_MARKER } from '../lib/symbols'
 import map = require('starry.map')
 import { inspect } from 'util'
 
+test('empty tree', t => {
+  const trie = new OpenRadixTrie<number>()
+  const rootNode = (trie as any).r as Node<number>
+  t.is(rootNode.customChildren.size, 0)
+  t.deepEqual(rootNode.stringChildren, [])
+  t.true(rootNode.value === undefined)
+  t.true(trie.get('').value === undefined)
+})
+
 test('add new node', t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
