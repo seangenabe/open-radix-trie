@@ -17,6 +17,7 @@ import {
   RootNode
 } from './node'
 import { ROOT_MARKER } from './symbols'
+import { normalizePathComponents } from './normalize-path-components'
 
 export default class OpenRadixTrie<
   TValue,
@@ -62,9 +63,9 @@ export default class OpenRadixTrie<
     value: TValue
   ): void {
     let currentComponent: string | ExtensiblePathComponent | undefined
-    do {
-      currentComponent = pathComponents.shift()
-    } while (currentComponent === '')
+    pathComponents = normalizePathComponents(pathComponents)
+
+    currentComponent = pathComponents.shift()
 
     // If current path component is undefined (array has been exhausted):
     if (currentComponent === undefined) {
@@ -230,25 +231,7 @@ export default class OpenRadixTrie<
       builtPath = path(this.x)
     }
 
-    return this.normalizePathComponents(builtPath)
-  }
-
-  private normalizePathComponents(
-    pathComponents: Iterable<string | ExtensiblePathComponent>
-  ) {
-    const ret: (string | ExtensiblePathComponent)[] = []
-    for (let item of pathComponents) {
-      if (item === '') {
-        continue
-      }
-      const last = ret[ret.length - 1]
-      if (typeof last === 'string' && typeof item === 'string') {
-        ret[ret.length - 1] = last + item
-      } else {
-        ret.push(item)
-      }
-    }
-    return ret
+    return normalizePathComponents(builtPath)
   }
 
   delete(path: ExtensiblePath<TContext> | string): boolean {
