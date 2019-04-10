@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/node": "^9.4.4",
     "archy": "^1.0.0",
-    "ava": "^0.25.0",
+    "ava": "^1.4.1",
     "starry.map": "^3.0.0",
     "typescript": "^2.9.2"
   },
