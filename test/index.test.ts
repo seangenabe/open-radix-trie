@@ -1,21 +1,21 @@
-import test, { TestContext } from 'ava'
-import { Node } from '../lib/node'
-import OpenRadixTrie from '../lib/open-radix-trie'
-import { ROOT_MARKER } from '../lib/symbols'
+import test, { ExecutionContext } from "ava"
+import { Node } from "../lib/node"
+import OpenRadixTrie from "../lib/open-radix-trie"
+import { ROOT_MARKER } from "../lib/symbols"
 
-test('empty tree', t => {
+test("empty tree", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
   t.is(rootNode.customChildren.size, 0)
   t.deepEqual(rootNode.stringChildren, [])
   t.true(rootNode.value === undefined)
-  t.true(trie.get('').value === undefined)
+  t.true(trie.get("").value === undefined)
 })
 
-test('add new node', t => {
+test("add new node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toast', 1)
+  trie.set("toast", 1)
   checkTree(t, rootNode, {
     subtree: {
       toast: { value: 1 }
@@ -23,20 +23,20 @@ test('add new node', t => {
   })
 })
 
-test('remove new node', t => {
+test("remove new node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toast', 1)
-  trie.set('water', 2)
-  trie.delete('toast')
+  trie.set("toast", 1)
+  trie.set("water", 2)
+  trie.delete("toast")
   checkTree(t, rootNode, { subtree: { water: { value: 2 } } })
 })
 
-test('attach to existing node', t => {
+test("attach to existing node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toast', 1)
-  trie.set('toaster', 2)
+  trie.set("toast", 1)
+  trie.set("toaster", 2)
   checkTree(t, rootNode, {
     subtree: {
       toast: {
@@ -51,12 +51,12 @@ test('attach to existing node', t => {
   })
 })
 
-test('detach leaf node', t => {
+test("detach leaf node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toast', 1)
-  trie.set('toaster', 2)
-  trie.delete('toaster')
+  trie.set("toast", 1)
+  trie.set("toaster", 2)
+  trie.delete("toaster")
   checkTree(t, rootNode, {
     subtree: {
       toast: {
@@ -66,11 +66,11 @@ test('detach leaf node', t => {
   })
 })
 
-test('prefix an existing node', t => {
+test("prefix an existing node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toaster', 2)
-  trie.set('toast', 1)
+  trie.set("toaster", 2)
+  trie.set("toast", 1)
   checkTree(t, rootNode, {
     subtree: {
       toast: {
@@ -85,12 +85,12 @@ test('prefix an existing node', t => {
   })
 })
 
-test('recreate de-prefixed node', t => {
+test("recreate de-prefixed node", t => {
   const trie = new OpenRadixTrie<number>()
   const rootNode = (trie as any).r as Node<number>
-  trie.set('toaster', 2)
-  trie.set('toast', 1)
-  trie.delete('toast')
+  trie.set("toaster", 2)
+  trie.set("toast", 1)
+  trie.delete("toast")
   checkTree(t, rootNode, {
     subtree: {
       toaster: {
@@ -100,10 +100,10 @@ test('recreate de-prefixed node', t => {
   })
 })
 
-test('split existing node', t => {
+test("split existing node", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
+  trie.set("toast", 1)
+  trie.set("test", 2)
   const rootNode = (trie as any).r as Node<number>
   checkTree(t, rootNode, {
     subtree: {
@@ -117,11 +117,11 @@ test('split existing node', t => {
   })
 })
 
-test('merge split nodes 1', t => {
+test("merge split nodes 1", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
-  trie.delete('toast')
+  trie.set("toast", 1)
+  trie.set("test", 2)
+  trie.delete("toast")
   const rootNode = (trie as any).r as Node<number>
   checkTree(t, rootNode, {
     subtree: {
@@ -130,11 +130,11 @@ test('merge split nodes 1', t => {
   })
 })
 
-test('merge split nodes 2', t => {
+test("merge split nodes 2", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
-  trie.delete('test')
+  trie.set("toast", 1)
+  trie.set("test", 2)
+  trie.delete("test")
   const rootNode = (trie as any).r as Node<number>
   checkTree(t, rootNode, {
     subtree: {
@@ -143,36 +143,36 @@ test('merge split nodes 2', t => {
   })
 })
 
-test('get exact', t => {
+test("get exact", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
-  const result = trie.get('toast')
+  trie.set("toast", 1)
+  trie.set("test", 2)
+  const result = trie.get("toast")
   t.deepEqual(result.args, [])
-  t.is(result.remainingPath, '')
+  t.is(result.remainingPath, "")
   t.is(result.value, 1)
 })
 
-test('get with remaining', t => {
+test("get with remaining", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
-  const result = trie.get('toasted')
+  trie.set("toast", 1)
+  trie.set("test", 2)
+  const result = trie.get("toasted")
   t.deepEqual(result.args, [])
-  t.is(result.remainingPath, 'ed')
+  t.is(result.remainingPath, "ed")
   t.is(result.value, 1)
 })
 
-test('get no match', t => {
+test("get no match", t => {
   const trie = new OpenRadixTrie<number>()
-  trie.set('toast', 1)
-  trie.set('test', 2)
-  const result = trie.get('treetop')
+  trie.set("toast", 1)
+  trie.set("test", 2)
+  const result = trie.get("treetop")
   t.deepEqual(result.args, [])
   t.is(result.value, undefined)
 })
 
-test('get with custom path component', t => {
+test("get with custom path component", t => {
   const context = {
     word() {
       return s => {
@@ -184,12 +184,12 @@ test('get with custom path component', t => {
   }
   const trie = new OpenRadixTrie<number, typeof context>(context)
   trie.set(r => r`sky ${r.word()} orange`, 7)
-  const result = trie.get('sky apple orange')
+  const result = trie.get("sky apple orange")
   t.is(result.value, 7)
-  t.deepEqual(result.args, ['apple'])
+  t.deepEqual(result.args, ["apple"])
 })
 
-test('get with custom path component (negate)', t => {
+test("get with custom path component (negate)", t => {
   const context = {
     word() {
       return s => {
@@ -201,7 +201,7 @@ test('get with custom path component (negate)', t => {
   }
   const trie = new OpenRadixTrie<number, typeof context>(context)
   trie.set(r => r`sky ${r.word()} orange`, 7)
-  const result = trie.get('sky ')
+  const result = trie.get("sky ")
   t.is(result.value, undefined)
   t.deepEqual(result.args, [])
 })
@@ -212,14 +212,14 @@ interface TreeDef<T> {
 }
 
 function checkTree<T>(
-  t: TestContext,
+  t: ExecutionContext<unknown>,
   node: Node<T>,
   obj: TreeDef<T>,
   path: string[] = []
 ) {
   const newPath = [
     ...path,
-    node.key === ROOT_MARKER ? 'ROOT' : String(node.key)
+    node.key === ROOT_MARKER ? "ROOT" : String(node.key)
   ]
   t.is(
     node.value,
@@ -228,7 +228,7 @@ function checkTree<T>(
   )
   if (obj.subtree) {
     for (let [key, value] of Object.entries(obj.subtree)) {
-      if (typeof key === 'string') {
+      if (typeof key === "string") {
         const child = node.stringChildren.find(n => n.key === key)
         t.true(
           child != null,
@@ -243,5 +243,5 @@ function checkTree<T>(
 }
 
 function pathToString(path: string[]) {
-  return path.join('->')
+  return path.join("->")
 }

@@ -29,11 +29,11 @@
     "xerpath": "^3.1.0"
   },
   "devDependencies": {
-    "@types/node": "^9.4.4",
+    "@types/node": "^11.13.2",
     "archy": "^1.0.0",
     "ava": "^1.4.1",
     "starry.map": "^3.0.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.4.2"
   },
   "ava": {
     "files": [
